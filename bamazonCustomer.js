@@ -80,15 +80,6 @@ function start() {
 
                 if (quantity <= response[0].quantity) {
                     console.log('Product ordered!');
-
-                    var newQuery = 'UPDATE bamazon_db.products SET quantity = ' + (response.quantity - answer.productQuantity) + ' WHERE id = ' + product;
-
-                    // Update the inventory
-                    connection.query(newQuery, function (error, response) {
-                        if (error) throw error;
-
-                        console.log(product);
-                    })
                 } 
                 else {
                     console.log("\n We dont have enough! Try aomething else");
