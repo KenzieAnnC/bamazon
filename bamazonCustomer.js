@@ -92,22 +92,36 @@ function start() {
     });
 }
 
-function updateQuantity(productID, units) {
+function updateQuantity(productID, productUnits) {
+
     var query = "SELECT * FROM bamazon_db.products WHERE ?";
+
     connection.query(query, { id: productID }, function (error, response) {
         if (error) throw error;
 
-        console.log(productID);
-        var newQuantity = response[0].quantity - units;
+        var newQuantity = response[0].quantity - productUnits;
 
         if (newQuantity < 0)
             newQuantity = 0;
 
-
         var newQuery = "UPDATE bamazon_db.products SET ? WHERE ?"
+
         connection.query(newQuery, [{ quantity: newQuantity }, { id: productID }], function (error, response) {
             readProducts();
+            getTotalCost(productID, productUnits);
         });
+
+    });
+}
+
+function getTotalCost(productID, productUnits) {
+    connection.query("SELECT * FROM products WHERE ?", {
+        id: productID
+    }, function(error, response) {
+        if (error) throw error;
+
+        var totalCost = response[0].price * productUnits;
+        console.log("Total cost is $ " + totalCost);
 
     });
 }
