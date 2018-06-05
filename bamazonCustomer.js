@@ -8,13 +8,10 @@ var mysql = require("mysql");
 var connection = mysql.createConnection({
     host: "localhost",
 
-    // Your port; if not 3306
     port: 3306,
 
-    // Your username
     user: "root",
 
-    // Your password
     password: "Iycdiycdi!",
     database: "bamazon_db"
 });
@@ -28,6 +25,9 @@ connection.connect(function (error) {
     start();
 });
 
+/////////////////////////////////////////////////
+//        lists all products                   //
+/////////////////////////////////////////////////
 
 function readProducts() {
     console.log("Selecting all products...\n");
@@ -42,6 +42,10 @@ function readProducts() {
         if (error) throw error;
     });
 }
+
+/////////////////////////////////////////////////
+//                 start app                   //
+/////////////////////////////////////////////////
 
 function start() {
     readProducts();
@@ -92,6 +96,10 @@ function start() {
     });
 }
 
+/////////////////////////////////////////////////
+//         updating the sql database           //
+/////////////////////////////////////////////////
+
 function updateQuantity(productID, productUnits) {
 
     var query = "SELECT * FROM bamazon_db.products WHERE ?";
@@ -107,12 +115,17 @@ function updateQuantity(productID, productUnits) {
         var newQuery = "UPDATE bamazon_db.products SET ? WHERE ?"
 
         connection.query(newQuery, [{ quantity: newQuantity }, { id: productID }], function (error, response) {
-            readProducts();
             getTotalCost(productID, productUnits);
         });
-
+        
+        readProducts();
+        restart();
     });
 }
+
+/////////////////////////////////////////////////
+//         show the user their total          //
+/////////////////////////////////////////////////
 
 function getTotalCost(productID, productUnits) {
     connection.query("SELECT * FROM products WHERE ?", {
@@ -121,7 +134,26 @@ function getTotalCost(productID, productUnits) {
         if (error) throw error;
 
         var totalCost = response[0].price * productUnits;
-        console.log("Total cost is $ " + totalCost);
+        console.log("\nTotal cost: $" + totalCost);
 
+    });
+}
+
+/////////////////////////////////////////////////
+//              buy more stuff!                //
+/////////////////////////////////////////////////
+
+function restart() {
+    inquirer.prompt([{
+        type: "confirm",
+        message: "Add more products? C'mon, you know you want to!",
+        name: "confirm",
+        default: true
+    }]).then(function(answer) {
+        if (answer.confirm)
+            start();
+        else {
+            connection.end();
+        }
     });
 }
