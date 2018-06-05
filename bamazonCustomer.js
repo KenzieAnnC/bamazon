@@ -78,7 +78,7 @@ function start() {
 
             } else {
 
-                if (quantity <= response.quantity) {
+                if (quantity <= response[0].quantity) {
                     console.log('Product ordered!');
 
                     var newQuery = 'UPDATE bamazon_db.products SET quantity = ' + (response.quantity - answer.productQuantity) + ' WHERE id = ' + product;
